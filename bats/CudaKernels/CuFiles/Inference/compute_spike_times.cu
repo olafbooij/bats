@@ -70,6 +70,11 @@ extern "C" {
                 return false;
 
             // Spike time is valid
+
+            // -> check if the spike would also occur at discrete timestep
+            // -> if not then return false
+            // -> if so change to that time and all variables dependent on time...:
+
             a[*n_spikes] = cumul_a;
             x[*n_spikes] = x_tmp;
             spike_times[*n_spikes] = tmp;

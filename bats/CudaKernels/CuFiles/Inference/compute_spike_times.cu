@@ -48,6 +48,7 @@ extern "C" {
                                    int max_n_post_spike,
                                    int sample_idx) {
         float x_tmp, inside_log, tmp;
+        float timestep_freq = 10000000.;
 
         // Compute until there is no spike anymore
         while (true) {
@@ -65,22 +66,26 @@ extern "C" {
                 return false;
 
             tmp = tau * __logf(inside_log);
+
+            // increase firing time to closest time step 
+            tmp = ceilf(tmp * timestep_freq) / timestep_freq;
+
+            // check if the spike would also occur at discrete timestep, and if not break
+            if (- __expf(- tmp/tau) * __expf(- tmp/tau) * cumul_a  + __expf(- tmp/tau) * *cumul_b < c)
+                return false;
+
             // Spike time is before the last pre-spike or after the next spike --> stop
             if (tmp <= last_spike || tmp > max_simulation || tmp > next_spike)
                 return false;
 
             // Spike time is valid
 
-            // -> check if the spike would also occur at discrete timestep
-            // -> if not then return false
-            // -> if so change to that time and all variables dependent on time...:
-
             a[*n_spikes] = cumul_a;
             x[*n_spikes] = x_tmp;
             spike_times[*n_spikes] = tmp;
             last_spike = tmp;
-            post_exp_tau[*n_spikes] = inside_log;
-            *cumul_b -= delta_theta_tau * inside_log; // Apply reset to b
+            post_exp_tau[*n_spikes] = inside_log; // TODO, this might need to be adjusted too, check backprop implementation
+            *cumul_b -= delta_theta_tau * inside_log; // Apply reset to b // TODO, this needs to be adjusted given shifted time
             (*n_spikes)++;
             if (*n_spikes >= max_n_post_spike) {
                 return true;

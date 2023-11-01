@@ -1,4 +1,4 @@
-# Error Backpropagation Through Spikes (BATS)
+# Modified version of Error Backpropagation Through Spikes (BATS)
 
 Error Backpropagation Through Spikes (BATS) [1] is a GPU-compatible algorithm that extends Fast & Deep [2], 
 a method to performs exact gradient descent in Deep Spiking Neural Networks (SNNs). 
@@ -8,6 +8,10 @@ performances. The proposed algorithm backpropagates the errors through post-syna
 This repository contains the full Cuda implementations of our efficient event-based SNN simulator and the BATS algorithm.
 All the experiments on the convergence of single and multi-spike models, on the MNIST dataset, its extended version 
 EMNIST and Fashion MNIST are also provided to reproduce our results. 
+
+# Modification
+
+This modified version applies an artificial discretization to the spike times in the inference step, to mimic the behaviour of a time steps based simulator as frequently used. Of course the speed in this case in not time step dependent, allowing for arbitrary small time steps.
 
 ## Dependencies and Libraries
 

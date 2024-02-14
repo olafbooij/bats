@@ -44,14 +44,15 @@ def accuracy(predictions: np.ndarray, labels: np.ndarray) -> np.ndarray:
 def train(network: Network, output_layer: AbstractLayer, loss_fct: AbstractLoss, optimizer: AbstractOptimizer,
           weight_mean, weight_std):
     weights = np.random.normal(loc=weight_mean, scale=weight_std, size=(N_OUTPUTS, N_INPUTS))
-    print(weights)
     output_layer.weights = weights
     best_accuracy = 0.0
     for epoch in range(N_TRAINING_EPOCHS):
+        print(f"weight: {output_layer.weights[0, 0]}")
         # Training inference
         network.reset()
         network.forward(SPIKE_TIMES, N_SPIKE_TIMES, max_simulation=SIMULATION_TIME)
         out_spikes, n_out_spikes = network.output_spike_trains
+        print(f"spike : {out_spikes[0, 0, 0]}")
 
         # Metrics
         pred = get_predictions(out_spikes)
@@ -65,7 +66,7 @@ def train(network: Network, output_layer: AbstractLayer, loss_fct: AbstractLoss,
         network.apply_deltas(deltas)
 
         acc = accuracy(pred.get(), LABELS) * 100
-        print(loss)
+        print(f"loss  : {loss[0]}")
         if acc > best_accuracy:
             best_accuracy = acc
     return best_accuracy

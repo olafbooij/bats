@@ -48,7 +48,7 @@ extern "C" {
                                    int max_n_post_spike,
                                    int sample_idx) {
         float x_tmp, inside_log, tmp;
-        float timestep_freq = 10000000.;
+        float timestep_freq = 100.;
 
         // Compute until there is no spike anymore
         while (true) {
@@ -71,6 +71,7 @@ extern "C" {
             tmp = ceilf(tmp * timestep_freq) / timestep_freq;
 
             // check if the spike would also occur at discrete timestep, and if not break
+            //printf("%e \n", - __expf(- tmp/tau) * __expf(- tmp/tau) * cumul_a  + __expf(- tmp/tau) * *cumul_b - c);
             if (- __expf(- tmp/tau) * __expf(- tmp/tau) * cumul_a  + __expf(- tmp/tau) * *cumul_b < c)
                 return false;
 

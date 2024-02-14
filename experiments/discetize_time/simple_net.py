@@ -37,7 +37,7 @@ DELTA_THRESHOLD_OUTPUT = THRESHOLD_HAT_OUTPUT
 SPIKE_BUFFER_SIZE_OUTPUT = 1
 
 # Training parameters
-N_TRAINING_EPOCHS = 50
+N_TRAINING_EPOCHS = 10
 TAU_LOSS = 0.1
 LEARNING_RATE = 1e-1  # np.full((3,), 1e-2)
 
@@ -64,7 +64,7 @@ def train(network: Network, output_layer: AbstractLayer, loss_fct: AbstractLoss,
 
         # Metrics
         pred = get_predictions(out_spikes)
-        _loss, errors = loss_fct.compute_loss_and_errors(out_spikes, n_out_spikes, LABELS_GPU)
+        loss, errors = loss_fct.compute_loss_and_errors(out_spikes, n_out_spikes, LABELS_GPU)
 
         #gradient = network.backward(errors, cp.array(LABELS))
         gradient = network.backward(errors)
@@ -74,7 +74,7 @@ def train(network: Network, output_layer: AbstractLayer, loss_fct: AbstractLoss,
         network.apply_deltas(deltas)
 
         acc = accuracy(pred.get(), LABELS) * 100
-        print(acc)
+        print(loss)
         if acc > best_accuracy:
             best_accuracy = acc
     return best_accuracy

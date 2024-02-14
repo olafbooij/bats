@@ -1,10 +1,7 @@
 
 import cupy as cp
-
-# Dataset paths
 import numpy as np
 
-from bats import AbstractOptimizer, AbstractLoss, AbstractLayer
 from bats.Layers import InputLayer, LIFLayer
 from bats.Losses import SpikeTimeLoss
 from bats.Network import Network
@@ -27,54 +24,7 @@ THRESHOLD_HAT_OUTPUT = 1.0
 DELTA_THRESHOLD_OUTPUT = THRESHOLD_HAT_OUTPUT
 SPIKE_BUFFER_SIZE_OUTPUT = 1
 
-# Training parameters
-N_TRAINING_EPOCHS = 10
-TAU_LOSS = 0.1
-LEARNING_RATE = 1e-1  # np.full((3,), 1e-2)
-
-
-def get_predictions(output_spikes: cp.ndarray) -> cp.ndarray:
-    return cp.argmin(output_spikes[:, :, 0], axis=1)
-
-
-def accuracy(predictions: np.ndarray, labels: np.ndarray) -> np.ndarray:
-    return np.sum(predictions == labels) / len(labels)
-
-
-def train(network: Network, output_layer: AbstractLayer, loss_fct: AbstractLoss, optimizer: AbstractOptimizer,
-          weight_mean, weight_std):
-    weights = np.random.normal(loc=weight_mean, scale=weight_std, size=(N_OUTPUTS, N_INPUTS))
-    output_layer.weights = weights
-    best_accuracy = 0.0
-    for epoch in range(N_TRAINING_EPOCHS):
-        print(f"weight    = {output_layer.weights[0, 0]}")
-        # Training inference
-        network.reset()
-        network.forward(SPIKE_TIMES, N_SPIKE_TIMES, max_simulation=SIMULATION_TIME)
-        out_spikes, n_out_spikes = network.output_spike_trains
-        print(f"spiketime = {out_spikes[0, 0, 0]}")
-
-        # Metrics
-        pred = get_predictions(out_spikes)
-        loss, errors = loss_fct.compute_loss_and_errors(out_spikes, n_out_spikes, LABELS_GPU)
-        print(f"loss      = {loss[0]}")
-
-        #gradient = network.backward(errors, cp.array(LABELS))
-        gradient = network.backward(errors)
-        print(f"gradient  = {gradient[1][0, 0, 0]}")
-
-        avg_gradient = [None if g is None else cp.mean(g, axis=0) for g in gradient]
-        deltas = optimizer.step(avg_gradient)
-        network.apply_deltas(deltas)
-
-        acc = accuracy(pred.get(), LABELS) * 100
-        if acc > best_accuracy:
-            best_accuracy = acc
-    return best_accuracy
-
-
 if __name__ == "__main__":
-    print("Creating network...")
     network = Network()
     input_layer = InputLayer(n_neurons=N_INPUTS, name="Input layer")
     network.add_layer(input_layer, input=True)
@@ -87,7 +37,23 @@ if __name__ == "__main__":
     network.add_layer(output_layer)
 
     loss_fct = SpikeTimeLoss()
-    optimizer = GradientDescentOptimizer(LEARNING_RATE)
 
-    acc = train(network, output_layer, loss_fct, optimizer, 4.0, 0.0)
-    print(acc)
+    # one step
+    output_layer.weights = np.array([[4.]])
+    print(f"weight    = {output_layer.weights[0, 0]}")
+    network.forward(SPIKE_TIMES, N_SPIKE_TIMES, max_simulation=SIMULATION_TIME)
+    out_spikes, n_out_spikes = network.output_spike_trains
+    print(f"spiketime = {out_spikes[0, 0, 0]}")
+    loss, errors = loss_fct.compute_loss_and_errors(out_spikes, n_out_spikes, LABELS_GPU)
+    print(f"loss      = {loss[0]}")
+    gradient = network.backward(errors)
+    print(f"gradient  = {gradient[1][0, 0, 0]}")
+
+    #s_m = exp(-spiketime / 2)
+    #s_s = exp(- spiketime / 1)
+    #dtdw = - (s_m - s_s) / (weight * (-s_m / 2 + s_s))
+    #dldt * dtdw * .1
+    ##loss = spiketime ^ 2 / 2
+    #dldt = spiketime
+    #== gradient
+

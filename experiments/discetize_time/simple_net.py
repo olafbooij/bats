@@ -1,4 +1,3 @@
-
 import cupy as cp
 from math import exp
 import numpy as np
@@ -8,40 +7,31 @@ from bats.Losses import SpikeTimeLoss
 from bats.Network import Network
 from bats.Optimizers import GradientDescentOptimizer
 
-# Dataset
-SPIKE_TIMES = np.array([[[0]]])
-N_SPIKE_TIMES = np.array([[1]])
-LABELS = np.array([0])
-LABELS_GPU = cp.array(LABELS, dtype=cp.int32)
-
-# Model parameters
-N_INPUTS = 1
-SIMULATION_TIME = 10.0
-
-# Output_layer
-N_OUTPUTS = 1
-TAU_S_OUTPUT = 1.0
-THRESHOLD_HAT_OUTPUT = 1.0
-DELTA_THRESHOLD_OUTPUT = THRESHOLD_HAT_OUTPUT
-SPIKE_BUFFER_SIZE_OUTPUT = 1
 
 if __name__ == "__main__":
     network = Network()
-    input_layer = InputLayer(n_neurons=N_INPUTS, name="Input layer")
+    input_layer = InputLayer(n_neurons=1, name="Input layer")
     network.add_layer(input_layer, input=True)
 
-    output_layer = LIFLayer(previous_layer=input_layer, n_neurons=N_OUTPUTS, tau_s=TAU_S_OUTPUT,
-                            theta=THRESHOLD_HAT_OUTPUT,
-                            delta_theta=DELTA_THRESHOLD_OUTPUT,
-                            max_n_spike=SPIKE_BUFFER_SIZE_OUTPUT,
+    threshold_hat_output = 1.0
+    delta_threshold_output = threshold_hat_output
+    output_layer = LIFLayer(previous_layer=input_layer, n_neurons=1, tau_s=1.,
+                            theta=threshold_hat_output,
+                            delta_theta=delta_threshold_output,
+                            max_n_spike=1,
                             name="Output layer")
     network.add_layer(output_layer)
 
     loss_fct = SpikeTimeLoss()
 
     weight = 4.
+    input_spike_time = 0.
+    SPIKE_TIMES = np.array([[[input_spike_time]]])
+    N_SPIKE_TIMES = np.array([[1]])
+    LABELS_GPU = cp.array([0], dtype=cp.int32)
+
     output_layer.weights = np.array([[weight]])
-    network.forward(SPIKE_TIMES, N_SPIKE_TIMES, max_simulation=SIMULATION_TIME)
+    network.forward(SPIKE_TIMES, N_SPIKE_TIMES, max_simulation=10.)
     out_spikes, n_out_spikes = network.output_spike_trains
     _loss, errors = loss_fct.compute_loss_and_errors(out_spikes, n_out_spikes, LABELS_GPU)
     spiketime = out_spikes[0, 0, 0]

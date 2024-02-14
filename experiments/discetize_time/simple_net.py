@@ -15,14 +15,10 @@ SPIKE_TIMES = np.array([[[0.0],
                          [0.0],
                          [1.0],
                          [2.0]],
-                        [[0.0],
-                         [0.0],
-                         [2.0],
-                         [1.0]]
-                        ])
+                       ])
 N_SPIKE_TIMES = np.array([[1, 1, 1, 1],
-                          [1, 1, 1, 1]])
-LABELS = np.array([0, 1])
+                         ])
+LABELS = np.array([0])
 LABELS_GPU = cp.array(LABELS, dtype=cp.int32)
 
 # Model parameters

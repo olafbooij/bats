@@ -48,7 +48,7 @@ extern "C" {
                                    int max_n_post_spike,
                                    int sample_idx) {
         float x_tmp, inside_log, tmp;
-        float timestep_freq = 10000000.;
+        float timestep_freq = 100.;
 
         // Compute until there is no spike anymore
         while (true) {
@@ -67,12 +67,13 @@ extern "C" {
 
             tmp = tau * __logf(inside_log);
 
-            // increase firing time to closest time step 
-            tmp = ceilf(tmp * timestep_freq) / timestep_freq;
+            //// increase firing time to closest time step 
+            //tmp = ceilf(tmp * timestep_freq) / timestep_freq;
 
-            // check if the spike would also occur at discrete timestep, and if not break
-            if (- __expf(- tmp/tau) * __expf(- tmp/tau) * cumul_a  + __expf(- tmp/tau) * *cumul_b < c)
-                return false;
+            //// check if the spike would also occur at discrete timestep, and if not break
+            ////printf("%e \n", - __expf(- tmp/tau) * __expf(- tmp/tau) * cumul_a  + __expf(- tmp/tau) * *cumul_b - c);
+            //if (- __expf(- tmp/tau) * __expf(- tmp/tau) * cumul_a  + __expf(- tmp/tau) * *cumul_b < c)
+            //    return false;
 
             // Spike time is before the last pre-spike or after the next spike --> stop
             if (tmp <= last_spike || tmp > max_simulation || tmp > next_spike)

@@ -6,7 +6,7 @@ import numpy as np
 
 from bats import AbstractOptimizer, AbstractLoss, AbstractLayer
 from bats.Layers import InputLayer, LIFLayer
-from bats.Losses import TTFSSoftmaxCrossEntropy
+from bats.Losses import SpikeTimeLoss
 from bats.Network import Network
 from bats.Optimizers import GradientDescentOptimizer
 
@@ -21,7 +21,7 @@ N_INPUTS = 1
 SIMULATION_TIME = 10.0
 
 # Output_layer
-N_OUTPUTS = 2
+N_OUTPUTS = 1
 TAU_S_OUTPUT = 1.0
 THRESHOLD_HAT_OUTPUT = 1.0
 DELTA_THRESHOLD_OUTPUT = THRESHOLD_HAT_OUTPUT
@@ -47,26 +47,27 @@ def train(network: Network, output_layer: AbstractLayer, loss_fct: AbstractLoss,
     output_layer.weights = weights
     best_accuracy = 0.0
     for epoch in range(N_TRAINING_EPOCHS):
-        print(f"weight: {output_layer.weights[0, 0]}")
+        print(f"weight    = {output_layer.weights[0, 0]}")
         # Training inference
         network.reset()
         network.forward(SPIKE_TIMES, N_SPIKE_TIMES, max_simulation=SIMULATION_TIME)
         out_spikes, n_out_spikes = network.output_spike_trains
-        print(f"spike : {out_spikes[0, 0, 0]}")
+        print(f"spiketime = {out_spikes[0, 0, 0]}")
 
         # Metrics
         pred = get_predictions(out_spikes)
         loss, errors = loss_fct.compute_loss_and_errors(out_spikes, n_out_spikes, LABELS_GPU)
+        print(f"loss      = {loss[0]}")
 
         #gradient = network.backward(errors, cp.array(LABELS))
         gradient = network.backward(errors)
+        print(f"gradient  = {gradient[1][0, 0, 0]}")
 
         avg_gradient = [None if g is None else cp.mean(g, axis=0) for g in gradient]
         deltas = optimizer.step(avg_gradient)
         network.apply_deltas(deltas)
 
         acc = accuracy(pred.get(), LABELS) * 100
-        print(f"loss  : {loss[0]}")
         if acc > best_accuracy:
             best_accuracy = acc
     return best_accuracy
@@ -85,7 +86,7 @@ if __name__ == "__main__":
                             name="Output layer")
     network.add_layer(output_layer)
 
-    loss_fct = TTFSSoftmaxCrossEntropy(TAU_LOSS)
+    loss_fct = SpikeTimeLoss()
     optimizer = GradientDescentOptimizer(LEARNING_RATE)
 
     acc = train(network, output_layer, loss_fct, optimizer, 4.0, 0.0)

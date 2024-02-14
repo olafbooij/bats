@@ -11,18 +11,13 @@ from bats.Network import Network
 from bats.Optimizers import GradientDescentOptimizer
 
 # Dataset
-SPIKE_TIMES = np.array([[[0.0],
-                         [0.0],
-                         [1.0],
-                         [2.0]],
-                       ])
-N_SPIKE_TIMES = np.array([[1, 1, 1, 1],
-                         ])
+SPIKE_TIMES = np.array([[[0]]])
+N_SPIKE_TIMES = np.array([[1]])
 LABELS = np.array([0])
 LABELS_GPU = cp.array(LABELS, dtype=cp.int32)
 
 # Model parameters
-N_INPUTS = 4
+N_INPUTS = 1
 SIMULATION_TIME = 10.0
 
 # Output_layer
@@ -92,5 +87,5 @@ if __name__ == "__main__":
     loss_fct = TTFSSoftmaxCrossEntropy(TAU_LOSS)
     optimizer = GradientDescentOptimizer(LEARNING_RATE)
 
-    acc = train(network, output_layer, loss_fct, optimizer, 1.0, 0.0)
+    acc = train(network, output_layer, loss_fct, optimizer, 4.0, 0.0)
     print(acc)

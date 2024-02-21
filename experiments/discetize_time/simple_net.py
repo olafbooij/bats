@@ -40,6 +40,9 @@ if __name__ == "__main__":
     s_m = exp(-spiketime / 2)
     s_s = exp(-spiketime / 1)
     dtdw = - (s_m - s_s) / (weight * (-s_m / 2 + s_s))
+    print(f"gradient_gt_s_s_part={s_s  / (weight * (-s_m / 2 + s_s))}")
+    print(f"gradient_gt_s_m_part={- s_m  / (weight * (-s_m / 2 + s_s))}")
     gradient_gt = spiketime * dtdw
+    print(f"spiketime={spiketime}")
     print(f"gradient_gt={gradient_gt} ?= {gradient}=gradient")
     assert(abs(gradient_gt - gradient) < 1e-6)

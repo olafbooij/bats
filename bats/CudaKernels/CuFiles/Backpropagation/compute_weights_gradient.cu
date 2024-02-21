@@ -22,6 +22,7 @@ extern "C" {
         post_times += post_spike_offset;
         f1 += post_spike_offset;
         f2 += post_spike_offset;
+        //printf("post_spike_offset=%e\n", post_spike_offset); // == 0
         errors += post_spike_offset;
         gradient += post_neuron_offset * n_pre_neuron + pre_neuron_idx;
 
@@ -42,6 +43,11 @@ extern "C" {
                 j++;
             }
             *gradient += errors[i] * (f1[i] * sum_exp_tau_s - f2[i] * sum_exp_tau);
+            printf("f1[i]=%e\n", f1[i]);
+            //printf("sum_exp_tau_s=%e\n", sum_exp_tau_s); // == 1
+            printf("f2[i]=%e\n", f2[i]);
+            //printf("sum_exp_tau=%e\n", sum_exp_tau); // = 1
+            printf("gradient=%e\n", *gradient);
         }
     }
 }

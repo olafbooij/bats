@@ -81,11 +81,14 @@ extern "C" {
 
             // Spike time is valid
 
-            // update inside_log based on new time:
+            // now update vars used for backprop by reversing the computation
             inside_log = __expf(tmp/tau);
+            x_tmp = 2 * cumul_a / inside_log - *cumul_b;
+            // TODO should I also change cumul_a, guess so...
 
             a[*n_spikes] = cumul_a;
             x[*n_spikes] = x_tmp;
+            printf("x_tmp=%e\n", x_tmp);
             spike_times[*n_spikes] = tmp;
             last_spike = tmp;
             post_exp_tau[*n_spikes] = inside_log;

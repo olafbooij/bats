@@ -28,5 +28,9 @@ extern "C" {
             f1[spike_offset] = tau / a[spike_offset] * (1 + exp_tau[spike_offset] * c / x[spike_offset]);
         else // f2
             f2[spike_offset] = tau / x[spike_offset];
+        printf("tau=%e\n", tau);
+        printf("x[spike_offset]=%e\n", x[spike_offset]);
+        printf("f1[spike_offset]=%e\n", f1[spike_offset]);
+        printf("f2[spike_offset]=%e\n", f2[spike_offset]);
     }
 }

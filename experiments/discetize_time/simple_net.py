@@ -43,4 +43,3 @@ if __name__ == "__main__":
     gradient_gt = spiketime * dtdw
     print(f"gradient_gt={gradient_gt} ?= {gradient}=gradient")
     assert(abs(gradient_gt - gradient) < 1e-6)
-

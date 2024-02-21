@@ -81,12 +81,15 @@ extern "C" {
 
             // Spike time is valid
 
+            // update inside_log based on new time:
+            inside_log = __expf(tmp/tau);
+
             a[*n_spikes] = cumul_a;
             x[*n_spikes] = x_tmp;
             spike_times[*n_spikes] = tmp;
             last_spike = tmp;
-            post_exp_tau[*n_spikes] = inside_log; // TODO, this might need to be adjusted too, check backprop implementation
-            *cumul_b -= delta_theta_tau * inside_log; // Apply reset to b // TODO, this needs to be adjusted given shifted time
+            post_exp_tau[*n_spikes] = inside_log;
+            *cumul_b -= delta_theta_tau * inside_log;
             (*n_spikes)++;
             if (*n_spikes >= max_n_post_spike) {
                 return true;

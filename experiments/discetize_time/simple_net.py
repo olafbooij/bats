@@ -7,8 +7,11 @@ from bats.Losses import SpikeTimeLoss
 from bats.Network import Network
 from bats.Optimizers import GradientDescentOptimizer
 
+# Simple test to check if the gradient as computed by bats matches the one
+# computed "by hand", even if the spike time was discretitized.
 
 if __name__ == "__main__":
+    # create network of one input and one output neuron
     network = Network()
     input_layer = InputLayer(n_neurons=1, name="Input layer")
     network.add_layer(input_layer, input=True)
@@ -37,9 +40,12 @@ if __name__ == "__main__":
     spiketime = out_spikes[0, 0, 0]
     gradient = network.backward(errors)[1][0, 0, 0]
 
+    # compute gradient directly
     s_m = exp(-spiketime / 2)
     s_s = exp(-spiketime / 1)
     dtdw = - (s_m - s_s) / (weight * (-s_m / 2 + s_s))
     gradient_gt = spiketime * dtdw
     #print(f"gradient_gt={gradient_gt} ?= {gradient}=gradient")
-    assert(abs(gradient_gt - gradient) < 1e-6)
+
+    # gradient as computed by bats should match this directly computed gradient
+    assert(abs(gradient_gt - gradient) < 1e-7)

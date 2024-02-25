@@ -48,6 +48,8 @@ extern "C" {
                                    int max_n_post_spike,
                                    int sample_idx) {
         float x_tmp, inside_log, tmp;
+
+        // Set the timestep frequency
         float timestep_freq = 100.;
 
         // Compute until there is no spike anymore
@@ -67,10 +69,10 @@ extern "C" {
 
             tmp = tau * __logf(inside_log);
 
-            // increase firing time to closest time step 
+            // Increase firing time to closest time step 
             tmp = ceilf(tmp * timestep_freq) / timestep_freq;
 
-            // check if the spike would also occur at discrete timestep, and if not break
+            // Check if the spike would also occur at discrete timestep, and if not break
             float potential = - __expf(- tmp/tau) * __expf(- tmp/tau) * cumul_a  + __expf(- tmp/tau) * *cumul_b;
             if (potential < c)
                 return false;
@@ -81,7 +83,7 @@ extern "C" {
 
             // Spike time is valid
 
-            // update variables used for backprop by reversing the computation
+            // Update variables used for backprop by reversing the computation
             inside_log = __expf(tmp/tau);
             x_tmp = 2 * cumul_a / inside_log - *cumul_b;
 
@@ -90,7 +92,7 @@ extern "C" {
             spike_times[*n_spikes] = tmp;
             last_spike = tmp;
 
-            // updating this one to compensate for increased potential, which is higher than the threshold
+            // Updating this one to compensate for increased potential, which is higher than the threshold
             post_exp_tau[*n_spikes] = inside_log * potential / c;
             *cumul_b -= delta_theta_tau * inside_log;
             (*n_spikes)++;

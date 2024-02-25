@@ -71,7 +71,7 @@ extern "C" {
             tmp = ceilf(tmp * timestep_freq) / timestep_freq;
 
             // check if the spike would also occur at discrete timestep, and if not break
-            //printf("%e \n", - __expf(- tmp/tau) * __expf(- tmp/tau) * cumul_a  + __expf(- tmp/tau) * *cumul_b - c);
+            printf("%e \n", - __expf(- tmp/tau) * __expf(- tmp/tau) * cumul_a  + __expf(- tmp/tau) * *cumul_b);
             if (- __expf(- tmp/tau) * __expf(- tmp/tau) * cumul_a  + __expf(- tmp/tau) * *cumul_b < c)
                 return false;
 

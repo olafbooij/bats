@@ -17,6 +17,8 @@ extern "C" {
         int neuron_offset = sample_idx * n_neurons + neuron_idx;
         int spike_offset = neuron_offset * max_n_spikes + spike_idx;
 
+        float actual_c = 5.039790e-01;
+
         if (isinf(spike_times[spike_offset])) { // No spike, set value to 0.0
             if (factor_idx == 0) // f1
                 f1[spike_offset] = 0.0;
@@ -25,9 +27,10 @@ extern "C" {
             return;
         }
         if (factor_idx == 0) // f1
-            f1[spike_offset] = tau / a[spike_offset] * (1 + exp_tau[spike_offset] * c / x[spike_offset]);
+            f1[spike_offset] = tau / a[spike_offset] * (1 + exp_tau[spike_offset] * actual_c / x[spike_offset]);
         else // f2
             f2[spike_offset] = tau / x[spike_offset];
+        printf("c=%e\n", c);
         printf("tau=%e\n", tau);
         printf("x[spike_offset]=%e\n", x[spike_offset]);
         printf("f1[spike_offset]=%e\n", f1[spike_offset]);

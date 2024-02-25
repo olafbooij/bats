@@ -72,7 +72,6 @@ extern "C" {
 
             // check if the spike would also occur at discrete timestep, and if not break
             float potential = - __expf(- tmp/tau) * __expf(- tmp/tau) * cumul_a  + __expf(- tmp/tau) * *cumul_b;
-            printf("%e \n", potential);
             if (potential < c)
                 return false;
 
@@ -82,16 +81,16 @@ extern "C" {
 
             // Spike time is valid
 
-            // now update vars used for backprop by reversing the computation
+            // update variables used for backprop by reversing the computation
             inside_log = __expf(tmp/tau);
             x_tmp = 2 * cumul_a / inside_log - *cumul_b;
-            // TODO should I also change cumul_a, guess so...
 
             a[*n_spikes] = cumul_a;
             x[*n_spikes] = x_tmp;
-            printf("x_tmp=%e\n", x_tmp);
             spike_times[*n_spikes] = tmp;
             last_spike = tmp;
+
+            // updating this one to compensate for increased potential, which is higher than the threshold
             post_exp_tau[*n_spikes] = inside_log * potential / c;
             *cumul_b -= delta_theta_tau * inside_log;
             (*n_spikes)++;

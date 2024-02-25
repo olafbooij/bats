@@ -71,8 +71,9 @@ extern "C" {
             tmp = ceilf(tmp * timestep_freq) / timestep_freq;
 
             // check if the spike would also occur at discrete timestep, and if not break
-            printf("%e \n", - __expf(- tmp/tau) * __expf(- tmp/tau) * cumul_a  + __expf(- tmp/tau) * *cumul_b);
-            if (- __expf(- tmp/tau) * __expf(- tmp/tau) * cumul_a  + __expf(- tmp/tau) * *cumul_b < c)
+            float potential = - __expf(- tmp/tau) * __expf(- tmp/tau) * cumul_a  + __expf(- tmp/tau) * *cumul_b;
+            printf("%e \n", potential);
+            if (potential < c)
                 return false;
 
             // Spike time is before the last pre-spike or after the next spike --> stop
@@ -91,7 +92,7 @@ extern "C" {
             printf("x_tmp=%e\n", x_tmp);
             spike_times[*n_spikes] = tmp;
             last_spike = tmp;
-            post_exp_tau[*n_spikes] = inside_log;
+            post_exp_tau[*n_spikes] = inside_log * potential / c;
             *cumul_b -= delta_theta_tau * inside_log;
             (*n_spikes)++;
             if (*n_spikes >= max_n_post_spike) {

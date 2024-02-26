@@ -94,9 +94,9 @@ extern "C" {
             spike_times[*n_spikes] = tmp;
             last_spike = tmp;
 
-            // Updating this one to compensate for increased potential, which is higher than the threshold
+            // Updating this ones to compensate for increased potential, which is higher than the threshold
             post_exp_tau[*n_spikes] = inside_log * potential / c;
-            *cumul_b -= delta_theta_tau * inside_log; // Apply reset to b
+            *cumul_b -= delta_theta_tau * post_exp_tau[*n_spikes]; // Apply reset to b
             (*n_spikes)++;
             if (*n_spikes >= max_n_post_spike) {
                 return true;

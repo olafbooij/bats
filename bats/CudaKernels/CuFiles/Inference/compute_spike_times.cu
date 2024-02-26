@@ -72,8 +72,11 @@ extern "C" {
             // Increase firing time to closest time step
             tmp = ceilf(tmp * timestep_freq) / timestep_freq;
 
-            // Check if the spike would also occur at discrete timestep, and if not break
-            float potential = - __expf(- tmp/tau) * __expf(- tmp/tau) * cumul_a  + __expf(- tmp/tau) * *cumul_b;
+            // Update variable using discretized tiem
+            inside_log = __expf(tmp/tau);
+
+            // Check if the spike would occur at discrete timestep, and if not break
+            float potential = - inside_log * inside_log * cumul_a  + inside_log * *cumul_b;
             if (potential < c)
                 return false;
 
@@ -83,8 +86,7 @@ extern "C" {
 
             // Spike time is valid
 
-            // Update variables used for backprop by reversing the computation
-            inside_log = __expf(tmp/tau);
+            // Update variable used for backprop by reversing computation
             x_tmp = 2 * cumul_a / inside_log - *cumul_b;
 
             a[*n_spikes] = cumul_a;

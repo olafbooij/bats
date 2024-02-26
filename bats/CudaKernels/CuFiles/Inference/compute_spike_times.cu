@@ -47,7 +47,7 @@ extern "C" {
                                    int neuron_idx,
                                    int max_n_post_spike,
                                    int sample_idx) {
-        float x_tmp, inside_log, tmp;
+        float x_tmp, inside_log, tmp, exp_spiketime;
 
         // Set the timestep frequency
         float timestep_freq = 100.;
@@ -72,11 +72,10 @@ extern "C" {
             // Increase firing time to closest time step
             tmp = ceilf(tmp * timestep_freq) / timestep_freq;
 
-            // Update variable using discretized tiem
-            inside_log = __expf(tmp/tau);
+            exp_spiketime = __expf(- tmp/tau);
 
             // Check if the spike would occur at discrete timestep, and if not break
-            float potential = - inside_log * inside_log * cumul_a  + inside_log * *cumul_b;
+            float potential = - exp_spiketime * exp_spiketime * cumul_a  + exp_spiketime * *cumul_b;
             if (potential < c)
                 return false;
 
@@ -86,7 +85,8 @@ extern "C" {
 
             // Spike time is valid
 
-            // Update variable used for backprop by reversing computation
+            // Update variables used for backprop by reversing computation
+            inside_log = 1. / exp_spiketime;
             x_tmp = 2 * cumul_a / inside_log - *cumul_b;
 
             a[*n_spikes] = cumul_a;

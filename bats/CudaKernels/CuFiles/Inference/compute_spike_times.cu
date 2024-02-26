@@ -69,7 +69,7 @@ extern "C" {
 
             tmp = tau * __logf(inside_log);
 
-            // Increase firing time to closest time step 
+            // Increase firing time to closest time step
             tmp = ceilf(tmp * timestep_freq) / timestep_freq;
 
             // Check if the spike would also occur at discrete timestep, and if not break
@@ -94,7 +94,7 @@ extern "C" {
 
             // Updating this one to compensate for increased potential, which is higher than the threshold
             post_exp_tau[*n_spikes] = inside_log * potential / c;
-            *cumul_b -= delta_theta_tau * inside_log;
+            *cumul_b -= delta_theta_tau * inside_log; // Apply reset to b
             (*n_spikes)++;
             if (*n_spikes >= max_n_post_spike) {
                 return true;

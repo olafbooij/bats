@@ -67,8 +67,8 @@ def weight_initializer_out(n_post: int, n_pre: int) -> cp.ndarray:
 
 if __name__ == "__main__":
     max_int = np.iinfo(np.int32).max
-    np_seed = 0 #np.random.randint(low=0, high=max_int)
-    cp_seed = 0 #np.random.randint(low=0, high=max_int)
+    np_seed = np.random.randint(low=0, high=max_int)
+    cp_seed = np.random.randint(low=0, high=max_int)
     np.random.seed(np_seed)
     cp.random.seed(cp_seed)
     print(f"Numpy seed: {np_seed}, Cupy seed: {cp_seed}")

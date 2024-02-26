@@ -47,7 +47,7 @@ extern "C" {
                                    int neuron_idx,
                                    int max_n_post_spike,
                                    int sample_idx) {
-        float x_tmp, inside_log, tmp, exp_spiketime;
+        float x_tmp, inside_log, tmp, potential, exp_spiketime;
 
         // Set the timestep frequency
         float timestep_freq = 100.;
@@ -75,7 +75,7 @@ extern "C" {
             exp_spiketime = __expf(- tmp/tau);
 
             // Check if the spike would occur at discrete timestep, and if not break
-            float potential = - exp_spiketime * exp_spiketime * cumul_a  + exp_spiketime * *cumul_b;
+            potential = - exp_spiketime * exp_spiketime * cumul_a  + exp_spiketime * *cumul_b;
             if (potential < c)
                 return false;
 
